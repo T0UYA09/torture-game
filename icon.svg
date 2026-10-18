@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="128" fill="#8a1414"/>
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="#1c1d21" stroke="#f7d24a" stroke-width="12"/>
+  <rect x="80" y="80" width="352" height="352" rx="32" fill="#8ba888"/>
+  <!-- Calavera Pixel Art Retro -->
+  <g fill="#182417">
+    <rect x="176" y="140" width="160" height="120" rx="10"/>
+    <rect x="192" y="260" width="128" height="60"/>
+    <!-- Ojos -->
+    <rect x="204" y="180" width="36" height="44" fill="#8ba888"/>
+    <rect x="272" y="180" width="36" height="44" fill="#8ba888"/>
+    <!-- Dientes -->
+    <rect x="216" y="280" width="16" height="24" fill="#8ba888"/>
+    <rect x="248" y="280" width="16" height="24" fill="#8ba888"/>
+    <rect x="280" y="280" width="16" height="24" fill="#8ba888"/>
+  </g>
+  <!-- Gotas de Sangre -->
+  <g fill="#d60000">
+    <rect x="140" y="320" width="24" height="40" rx="6"/>
+    <rect x="348" y="290" width="20" height="50" rx="6"/>
+    <rect x="220" y="360" width="16" height="24" rx="4"/>
+  </g>
+</svg>

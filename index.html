@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>TORTUREGOTCHI</title>
+  
+  <!-- Configuración PWA y Pantalla Completa para Android -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <meta name="theme-color" content="#8a1414">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="screen-orientation" content="landscape">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="tamagotchi-wrapper horizontal-wrapper">
+    <!-- Cadena / Llavero en la parte superior izquierda -->
+    <div class="chain-ring horizontal-chain">
+      <div class="chain-hole"></div>
+    </div>
+
+    <!-- Carcasa principal del Tamagotchi horizontal (Pantalla completa) -->
+    <div class="tamagotchi-body horizontal-body" id="tamagotchiBody">
+      
+      <!-- Barra superior: Tornillos, Marca y LED Vital -->
+      <div class="device-top horizontal-top">
+        <div class="screw screw-tl"></div>
+        
+        <div class="brand-title">
+          <span class="brand-icon">☠</span>
+          <span class="brand-text">TORTUREGOTCHI</span>
+          <span class="brand-version">v1.2</span>
+        </div>
+
+        <div class="led-container">
+          <div class="status-led" id="statusLed" title="Pulso Vital"></div>
+          <div class="led-label" id="ledLabel">VIVO</div>
+        </div>
+
+        <div class="screw screw-tr"></div>
+      </div>
+
+      <!-- Fila principal de 3 columnas -->
+      <div class="console-main-row">
+        
+        <!-- ALA IZQUIERDA: D-Pad y Botones A, B, C -->
+        <div class="console-wing wing-left">
+          <!-- D-PAD en cruz -->
+          <div class="dpad-cross">
+            <button class="dpad-btn dpad-up" id="btnDpadUp" title="Arrojar arriba [↑ / W]">▲</button>
+            <div class="dpad-middle-row">
+              <button class="dpad-btn dpad-left" id="btnDpadLeft" title="Estrellar izquierda [← / A]">◄</button>
+              <div class="dpad-pivot"></div>
+              <button class="dpad-btn dpad-right" id="btnDpadRight" title="Estrellar derecha [→ / D]">►</button>
+            </div>
+            <button class="dpad-btn dpad-down" id="btnDpadDown" title="Azotar abajo [↓ / S]">▼</button>
+          </div>
+
+          <!-- Botones Físicos Clásicos A, B, C -->
+          <div class="physical-buttons-cluster">
+            <div class="tamagotchi-btn-wrapper">
+              <button class="t-btn" id="btnActionA" title="Bofetada rápida [Z]">A</button>
+              <span class="btn-subtext">GOLPE</span>
+            </div>
+            <div class="tamagotchi-btn-wrapper">
+              <button class="t-btn btn-primary" id="btnActionB" title="Sacudir Pantalla [Espacio]">B</button>
+              <span class="btn-subtext">AGITAR</span>
+            </div>
+            <div class="tamagotchi-btn-wrapper">
+              <button class="t-btn" id="btnActionC" title="Limpiar Sangre [C]">C</button>
+              <span class="btn-subtext">LIMPIAR</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTRO: PANTALLA LCD VIRTUAL -->
+        <div class="console-center">
+          <div class="screen-bezel">
+            <div class="lcd-header">
+              <div class="stat-pill"><span class="stat-icon">❤️</span> <span id="hpText">100%</span></div>
+              <div class="stat-pill"><span class="stat-icon">⚡</span> <span id="painText">0%</span></div>
+              <div class="stat-pill status-pill" id="avatarStatus">NORMAL</div>
+            </div>
+
+            <div class="screen-canvas-container" id="canvasContainer">
+              <canvas id="gameCanvas" width="240" height="200"></canvas>
+              <div class="crt-scanlines"></div>
+              <div class="screen-cracks" id="screenCracks"></div>
+              <div class="blood-screen-overlay" id="screenVignette"></div>
+
+              <!-- Notificación de Logro Estilo GameBoy -->
+              <div class="achievement-toast" id="achievementToast">
+                <span class="toast-icon">🏆</span>
+                <div class="toast-text">
+                  <span class="toast-head">¡LOGRO DESBLOQUEADO!</span>
+                  <span class="toast-desc" id="achievementDesc">Primer Traumatismo</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="lcd-footer">
+              <div class="counter-box">
+                <span>DAÑO:</span>
+                <span id="totalDamage">0</span>
+              </div>
+              <div class="counter-box">
+                <span>COMBO:</span>
+                <span id="comboMultiplier">x1.0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALA DERECHA: Arsenal Digital y Pestañas -->
+        <div class="console-wing wing-right">
+          <!-- Pestañas de Selección -->
+          <div class="category-tabs">
+            <button class="cat-tab active" id="tabTorture" data-cat="torture">TORTURA</button>
+            <button class="cat-tab" id="tabWeapons" data-cat="weapons">ARMAS</button>
+            <button class="cat-tab" id="tabCare" data-cat="care">CUIDAR</button>
+            <button class="cat-tab" id="tabGore" data-cat="gore">GORE</button>
+          </div>
+
+          <!-- Pestaña 1: Herramientas de Tortura Clásica -->
+          <div class="tools-grid cat-panel active" id="panelTorture">
+            <button class="tool-btn btn-punch" id="btnPunch" title="Golpear [G / 1]">
+              <span class="btn-icon">🥊</span>
+              <span class="btn-label">GOLPE</span>
+            </button>
+            <button class="tool-btn btn-lightning" id="btnLightning" title="Rayo [R / 2]">
+              <span class="btn-icon">⚡</span>
+              <span class="btn-label">RAYO</span>
+            </button>
+            <button class="tool-btn btn-fire" id="btnFire" title="Fuego [F / 3]">
+              <span class="btn-icon">🔥</span>
+              <span class="btn-label">FUEGO</span>
+            </button>
+            <button class="tool-btn btn-saw" id="btnSaw" title="Sierra [S / 4]">
+              <span class="btn-icon">🪚</span>
+              <span class="btn-label">SIERRA</span>
+            </button>
+            <button class="tool-btn btn-acid" id="btnAcid" title="Ácido [A / 5]">
+              <span class="btn-icon">🧪</span>
+              <span class="btn-label">ÁCIDO</span>
+            </button>
+            <button class="tool-btn btn-spikes" id="btnSpikes" title="Agujas [N / 6]">
+              <span class="btn-icon">📌</span>
+              <span class="btn-label">AGUJAS</span>
+            </button>
+          </div>
+
+          <!-- Pestaña 2: Armamento y Caos -->
+          <div class="tools-grid cat-panel" id="panelWeapons" style="display: none;">
+            <button class="tool-btn btn-gun" id="btnGun" title="Pistola [P]">
+              <span class="btn-icon">🔫</span>
+              <span class="btn-label">PISTOLA</span>
+            </button>
+            <button class="tool-btn btn-freeze" id="btnFreeze" title="Hielo [I]">
+              <span class="btn-icon">❄️</span>
+              <span class="btn-label">HIELO</span>
+            </button>
+            <button class="tool-btn btn-anvil" id="btnAnvil" title="Yunque [Y]">
+              <span class="btn-icon">🪨</span>
+              <span class="btn-label">YUNQUE</span>
+            </button>
+            <button class="tool-btn btn-food" id="btnFood" title="Veneno [T]">
+              <span class="btn-icon">🍕</span>
+              <span class="btn-label">VENENO</span>
+            </button>
+            <button class="tool-btn btn-death" id="btnInstantDeath" title="Fatalidad [K / 7]">
+              <span class="btn-icon">💀</span>
+              <span class="btn-label">FATAL</span>
+            </button>
+            <button class="tool-btn btn-revive" id="btnRevive" title="Revivir [V / 8]">
+              <span class="btn-icon">💉</span>
+              <span class="btn-label">REVIVIR</span>
+            </button>
+          </div>
+
+          <!-- Pestaña 3: Cuidados y Tamagotchi Tierno -->
+          <div class="tools-grid cat-panel" id="panelCare" style="display: none;">
+            <button class="tool-btn btn-candy" id="btnCandy" title="Dar Dulces [D]">
+              <span class="btn-icon">🍬</span>
+              <span class="btn-label">DULCES</span>
+            </button>
+            <button class="tool-btn btn-sleep" id="btnSleep" title="Poner a Dormir [O]">
+              <span class="btn-icon">💤</span>
+              <span class="btn-label">DORMIR</span>
+            </button>
+            <button class="tool-btn btn-play" id="btnPlay" title="Jugar con Pelota [J]">
+              <span class="btn-icon">⚽</span>
+              <span class="btn-label">JUGAR</span>
+            </button>
+            <button class="tool-btn btn-pet" id="btnPet" title="Acariciar / Cosquillas [M]">
+              <span class="btn-icon">💖</span>
+              <span class="btn-label">MIMOS</span>
+            </button>
+            <button class="tool-btn btn-heal" id="btnHeal" title="Curar y Vendar [H]">
+              <span class="btn-icon">🩹</span>
+              <span class="btn-label">CURAR</span>
+            </button>
+            <button class="tool-btn btn-bath" id="btnBath" title="Bañar con Patito [L]">
+              <span class="btn-icon">🧼</span>
+              <span class="btn-label">BAÑAR</span>
+            </button>
+          </div>
+
+          <!-- Pestaña 4: Configuración de Sangre y Logros -->
+          <div class="gore-panel cat-panel" id="panelGore" style="display: none;">
+            <div class="gore-row">
+              <span class="setting-title">SANGRE:</span>
+              <div class="blood-color-picker">
+                <button class="color-dot active" data-color="crimson" style="background: #d60000;" title="Rojo"></button>
+                <button class="color-dot" data-color="pink" style="background: #ff3399;" title="Rosa"></button>
+                <button class="color-dot" data-color="acid" style="background: #00ff66;" title="Verde"></button>
+                <button class="color-dot" data-color="black" style="background: #1a1a1a;" title="Negro"></button>
+              </div>
+            </div>
+            <div class="gore-row">
+              <span class="setting-title">NIVEL:</span>
+              <div class="gore-mult-buttons">
+                <button class="gore-mult-btn active" data-mult="1">X1</button>
+                <button class="gore-mult-btn" data-mult="2">X2</button>
+                <button class="gore-mult-btn" data-mult="4">BAÑO</button>
+              </div>
+            </div>
+            <div class="gore-row achievement-summary-row">
+              <span class="setting-title">LOGROS:</span>
+              <span class="ach-count-badge" id="achUnlockedCount">0 / 8</span>
+              <button class="view-ach-btn" id="btnToggleAchList">VER</button>
+            </div>
+          </div>
+
+          <!-- Modal de Lista de Logros -->
+          <div class="achievements-modal" id="achievementsModal" style="display: none;">
+            <div class="modal-header">
+              <span>🏆 SALÓN DEL SUFRIMIENTO</span>
+              <button class="close-modal-btn" id="btnCloseAchModal">✖</button>
+            </div>
+            <div class="ach-list" id="achievementsListContainer"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Barra inferior: Utilidades, Altavoces y Pantalla Completa -->
+      <div class="device-bottom horizontal-bottom">
+        <div class="screw screw-bl"></div>
+
+        <div class="speaker-holes left-speaker">
+          <span></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="device-controls horizontal-controls">
+          <button class="util-btn" id="btnFullscreen" title="Pantalla Completa">
+            <span id="fsIcon">⛶</span> PANTALLA
+          </button>
+          <button class="util-btn" id="btnSoundToggle" title="Sonido">
+            <span id="soundIcon">🔊</span> AUDIO
+          </button>
+          <button class="util-btn" id="btnThemeToggle" title="Color Carcasa">
+            🎨 COLOR
+          </button>
+          <button class="util-btn" id="btnResetAll" title="Reiniciar">
+            🔄 REINICIO
+          </button>
+        </div>
+
+        <div class="speaker-holes right-speaker">
+          <span></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="screw screw-br"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+  <script>
+    // Registro del Service Worker para PWA en Android
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
+      });
+    }
+  </script>
+</body>
+</html>
